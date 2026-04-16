@@ -1,4 +1,5 @@
 export type {
+  AutomationTriggeredEventData,
   HassStateLike,
   StateChangedEventData,
   WebSocketEventName,

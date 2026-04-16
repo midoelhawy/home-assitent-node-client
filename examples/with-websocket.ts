@@ -1,4 +1,8 @@
-import { HomeAssistantClient, normalizeStateChangedEvent } from "../dist/index.js";
+import {
+  HomeAssistantClient,
+  normalizeStateChangedEvent,
+  type AutomationTriggeredEventData,
+} from "../dist/index.js";
 
 async function main() {
   const client = new HomeAssistantClient({
@@ -15,6 +19,7 @@ async function main() {
     if (n) {
       console.log(
         "state_changed",
+        n.coreDomain ?? n.domain,
         n.entityId,
         n.valueKind,
         n.isBinary ? `binary=${n.booleanValue}` : n.numericValue ?? n.rawState,
@@ -22,6 +27,18 @@ async function main() {
         n.lastUpdated?.toISOString() ?? "",
       );
     }
+    // For `automation.*`, `on`/`off` means enabled/disabled in Home Assistant.
+    if (ev.entity_id.startsWith("automation.")) {
+      const oldS = ev.old_state?.state;
+      const newS = ev.new_state?.state;
+      if (oldS !== newS) {
+        console.log("automation enable/disable", ev.entity_id, oldS, "->", newS);
+      }
+    }
+  });
+
+  client.ws!.on("automation_triggered", (ev: AutomationTriggeredEventData) => {
+    console.log("automation_triggered", ev.entity_id ?? ev.name ?? "(unknown)", ev.data);
   });
 
   const registry = await client.devices.getDeviceRegistry();

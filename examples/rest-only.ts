@@ -14,7 +14,7 @@ async function main() {
 
   const allStates = await client.devices.getAllDevices();
   console.log("entities (REST):", allStates.length);
-  console.log("ws is undefined (solo REST):", client.ws === undefined);
+  console.log("ws is undefined (REST-only):", client.ws === undefined);
 
   const automations = await client.server.listStatesByEntityDomain("automation");
   const scripts = await client.server.listStatesByEntityDomain("script");
@@ -37,14 +37,14 @@ async function main() {
   const historyEntity =
     automations[0]?.entity_id ?? scripts[0]?.entity_id ?? allStates[0]?.entity_id;
   if (!historyEntity) {
-    console.log("history: saltato (nessuna entità disponibile)");
+    console.log("history: skipped (no entity available)");
   } else {
     const history = await client.history.getHistory({
       start: historyStart,
       entityIds: [historyEntity],
       minimalResponse: true,
     });
-    console.log("history groups:", history.length, `(entità: ${historyEntity})`);
+    console.log("history groups:", history.length, `(entity: ${historyEntity})`);
     if (history[0]?.[0]) {
       console.log("history sample first point:", history[0][0].entity_id, history[0][0].state);
     }

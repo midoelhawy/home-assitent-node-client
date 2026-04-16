@@ -18,10 +18,20 @@ export interface HassStateLike {
   };
 }
 
+/** Payload for the Home Assistant bus event `automation_triggered` (automation run started). */
+export interface AutomationTriggeredEventData {
+  entity_id?: string;
+  name?: string;
+  /** Raw Home Assistant event `data` object (keys may vary by version). */
+  data: Record<string, unknown>;
+}
+
 export interface WebSocketEvents {
   connected: void;
   disconnected: void;
   state_changed: StateChangedEventData;
+  /** Fired when an automation is actually executed (triggered). */
+  automation_triggered: AutomationTriggeredEventData;
 }
 
 export type WebSocketEventName = keyof WebSocketEvents & string;

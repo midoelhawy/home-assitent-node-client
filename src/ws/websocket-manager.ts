@@ -35,7 +35,7 @@ export class WebSocketManager {
   private intentionalClose = false;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private reconnectAttempt = 0;
-  private subscribeStateChangedId: number | null = null;
+  private readonly eventSubscriptionByMsgId = new Map<number, "state_changed" | "automation_triggered">();
   private handshake: Promise<void> | null = null;
 
   private readonly listeners = new Map<
@@ -93,7 +93,7 @@ export class WebSocketManager {
     });
     this.ws = null;
     this.authenticated = false;
-    this.subscribeStateChangedId = null;
+    this.eventSubscriptionByMsgId.clear();
     this.emit("disconnected", undefined);
   }
 
@@ -201,7 +201,7 @@ export class WebSocketManager {
     fail: (e: Error) => void,
   ): Promise<void> {
     try {
-      await this.subscribeStateChanged();
+      await this.subscribeHaEventStreams();
       this.reconnectAttempt = 0;
       this.emit("connected", undefined);
       resolve();
@@ -213,10 +213,17 @@ export class WebSocketManager {
     }
   }
 
-  private async subscribeStateChanged(): Promise<void> {
+  private async subscribeHaEventStreams(): Promise<void> {
+    await this.subscribeHaEvent("state_changed");
+    await this.subscribeHaEvent("automation_triggered");
+  }
+
+  private async subscribeHaEvent(
+    eventType: "state_changed" | "automation_triggered",
+  ): Promise<void> {
     if (!this.ws || !this.authenticated) return;
     const id = this.msgId++;
-    this.subscribeStateChangedId = id;
+    this.eventSubscriptionByMsgId.set(id, eventType);
     await new Promise<void>((resolve, reject) => {
       this.pending.set(id, {
         resolve: () => resolve(),
@@ -226,7 +233,7 @@ export class WebSocketManager {
         JSON.stringify({
           id,
           type: "subscribe_events",
-          event_type: "state_changed",
+          event_type: eventType,
         }),
       );
     });
@@ -263,20 +270,35 @@ export class WebSocketManager {
 
     if (type === "event") {
       const id = msg.id as number | undefined;
-      if (id !== this.subscribeStateChangedId) return;
+      if (id === undefined) return;
+      const kind = this.eventSubscriptionByMsgId.get(id);
+      if (!kind) return;
       const ev = (msg as { event?: { event_type?: string; data?: unknown } }).event;
-      if (!ev || ev.event_type !== "state_changed") return;
-      const d = ev.data as {
-        entity_id?: string;
-        old_state?: StateChangedInner | null;
-        new_state?: StateChangedInner | null;
-      };
-      if (!d?.entity_id) return;
-      this.emit("state_changed", {
-        entity_id: d.entity_id,
-        old_state: d.old_state ?? null,
-        new_state: d.new_state ?? null,
-      });
+      if (!ev || ev.event_type !== kind) return;
+
+      if (kind === "state_changed") {
+        const d = ev.data as {
+          entity_id?: string;
+          old_state?: StateChangedInner | null;
+          new_state?: StateChangedInner | null;
+        };
+        if (!d?.entity_id) return;
+        this.emit("state_changed", {
+          entity_id: d.entity_id,
+          old_state: d.old_state ?? null,
+          new_state: d.new_state ?? null,
+        });
+        return;
+      }
+
+      const raw = ev.data;
+      const data =
+        raw !== null && typeof raw === "object" && !Array.isArray(raw)
+          ? (raw as Record<string, unknown>)
+          : {};
+      const entity_id = typeof data.entity_id === "string" ? data.entity_id : undefined;
+      const name = typeof data.name === "string" ? data.name : undefined;
+      this.emit("automation_triggered", { entity_id, name, data });
     }
   }
 
@@ -284,6 +306,7 @@ export class WebSocketManager {
     if (this.intentionalClose) return;
     this.authenticated = false;
     this.ws = null;
+    this.eventSubscriptionByMsgId.clear();
     for (const [, p] of this.pending) {
       p.reject(new WebSocketNotConnectedError("WebSocket closed"));
     }

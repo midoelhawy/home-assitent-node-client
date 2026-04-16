@@ -1,4 +1,5 @@
 import type { NormalizedEntityState } from "./normalized-entity-state.js";
+import { isHassCoreDomain } from "./hass-core-domains.js";
 import type { HassStateLike, StateChangedEventData } from "../ws/typed-events.js";
 
 const ON_OFF_DOMAINS = new Set([
@@ -115,6 +116,7 @@ function classify(
 export function normalizeHassState(state: HassStateNormalizable): NormalizedEntityState {
   const entityId = state.entity_id;
   const domain = entityId.includes(".") ? (entityId.split(".")[0] ?? "") : "";
+  const coreDomain = isHassCoreDomain(domain) ? domain : null;
   const rawState = state.state;
   const attrs = state.attributes ?? {};
 
@@ -123,6 +125,7 @@ export function normalizeHassState(state: HassStateNormalizable): NormalizedEnti
   return {
     entityId,
     domain,
+    coreDomain,
     rawState,
     lastChanged: parseIsoDate(state.last_changed),
     lastUpdated: parseIsoDate(state.last_updated),
