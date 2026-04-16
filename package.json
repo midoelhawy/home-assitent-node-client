@@ -1,0 +1,81 @@
+{
+  "name": "home-assistant-node-client",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for Home Assistant (REST + optional WebSocket)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js"
+    },
+    "./devices": {
+      "types": "./dist/devices/index.d.ts",
+      "import": "./dist/devices/index.js"
+    },
+    "./history": {
+      "types": "./dist/history/index.d.ts",
+      "import": "./dist/history/index.js"
+    },
+    "./zwave": {
+      "types": "./dist/zwave/index.d.ts",
+      "import": "./dist/zwave/index.js"
+    },
+    "./websocket": {
+      "types": "./dist/ws/index.d.ts",
+      "import": "./dist/ws/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "import": "./dist/errors.js"
+    },
+    "./http": {
+      "types": "./dist/http-client.d.ts",
+      "import": "./dist/http-client.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.js"
+    },
+    "./state": {
+      "types": "./dist/state/index.d.ts",
+      "import": "./dist/state/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test:rest_api_only": "env-cmd -f .env ts-node examples/rest-only.ts",
+    "test:with_websocket": "env-cmd -f .env ts-node examples/with-websocket.ts"
+  },
+  "keywords": [
+    "home-assistant",
+    "homeassistant",
+    "home-assistant-rest",
+    "websocket",
+    "typescript",
+    "sdk",
+    "zwave"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.13",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}
