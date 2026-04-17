@@ -58,6 +58,11 @@
   "engines": {
     "node": ">=18"
   },
+  "author": "Ahmed Hekal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/midoelhawy/home-assitent-node-client.git"
+  },
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build",
