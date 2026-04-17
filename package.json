@@ -1,6 +1,6 @@
 {
   "name": "home-assistant-node-client",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "TypeScript/JavaScript SDK for Home Assistant: REST API, optional WebSocket subscriptions, state helpers, and simplified entity actions.",
   "type": "module",
   "sideEffects": false,
