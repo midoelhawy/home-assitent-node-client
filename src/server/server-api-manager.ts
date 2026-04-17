@@ -1,4 +1,5 @@
 import type { HttpClient } from "../http-client.js";
+import type { HassCoreDomain } from "../state/hass-core-domains.js";
 import type {
   CallServiceResponse,
   HassApiStatus,
@@ -35,6 +36,17 @@ export class ServerApiManager {
     return await this.http.getJson<HassState[]>("/states");
   }
 
+  /**
+   * States for entities whose domain is a built-in Home Assistant core domain
+   * (e.g. `"automation"`, `"switch"`, `"sensor"`). Use {@link listStatesByEntityDomain} for custom integration domains.
+   */
+  async listStatesByCoreDomain(domain: HassCoreDomain): Promise<HassState[]> {
+    return await this.listStatesByEntityDomain(domain);
+  }
+
+  /**
+   * States for entities in the given domain (`${domain}.*`). Works for any domain string, including custom integrations.
+   */
   async listStatesByEntityDomain(domain: string): Promise<HassState[]> {
     const prefix = `${domain}.`;
     const states = await this.getEntityStates();

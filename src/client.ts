@@ -1,6 +1,7 @@
 import { DevicesManager } from "./devices/devices-manager.js";
 import { HistoryManager } from "./history/history-manager.js";
 import { HttpClient, type HttpClientOptions } from "./http-client.js";
+import { EntityActionsManager } from "./control/entity-actions-manager.js";
 import { ServerApiManager } from "./server/server-api-manager.js";
 import { ZWaveManager } from "./zwave/zwave-manager.js";
 import type { WebSocketManager } from "./ws/websocket-manager.js";
@@ -24,6 +25,8 @@ export class HomeAssistantClient {
   readonly history: HistoryManager;
   readonly zwave: ZWaveManager;
   readonly server: ServerApiManager;
+  /** Simplified turn_on / turn_off / automations / scripts / scenes. */
+  readonly actions: EntityActionsManager;
 
   private readonly token: string;
   private readonly baseUrl: string;
@@ -51,6 +54,7 @@ export class HomeAssistantClient {
     this.history = new HistoryManager(this.http);
     this.zwave = new ZWaveManager(this.http);
     this.server = new ServerApiManager(this.http);
+    this.actions = new EntityActionsManager(this.server);
 
     if (this.enableWebSocketFlag) {
       queueMicrotask(() => {

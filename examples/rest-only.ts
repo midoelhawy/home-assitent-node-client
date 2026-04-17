@@ -16,9 +16,9 @@ async function main() {
   console.log("entities (REST):", allStates.length);
   console.log("ws is undefined (REST-only):", client.ws === undefined);
 
-  const automations = await client.server.listStatesByEntityDomain("automation");
-  const scripts = await client.server.listStatesByEntityDomain("script");
-  const scenes = await client.server.listStatesByEntityDomain("scene");
+  const automations = await client.server.listStatesByCoreDomain("automation");
+  const scripts = await client.server.listStatesByCoreDomain("script");
+  const scenes = await client.server.listStatesByCoreDomain("scene");
   console.log("automations:", automations.length, automations.map((s) => s.entity_id).slice(0, 5), "…");
   console.log("scripts:", scripts.length);
   console.log("scenes:", scenes.length);

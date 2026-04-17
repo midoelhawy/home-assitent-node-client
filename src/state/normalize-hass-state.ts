@@ -1,18 +1,7 @@
 import type { NormalizedEntityState } from "./normalized-entity-state.js";
 import { isHassCoreDomain } from "./hass-core-domains.js";
+import { HASS_ON_OFF_DOMAIN_SET } from "./hass-on-off-domains.js";
 import type { HassStateLike, StateChangedEventData } from "../ws/typed-events.js";
-
-const ON_OFF_DOMAINS = new Set([
-  "switch",
-  "light",
-  "fan",
-  "lock",
-  "cover",
-  "siren",
-  "valve",
-  "automation",
-  "input_boolean",
-]);
 
 const BINARY_ALWAYS_DOMAINS = new Set(["binary_sensor", "input_boolean"]);
 
@@ -75,7 +64,7 @@ function classify(
     isBinary = true;
     valueKind = "binary";
     booleanValue = raw === "on" || raw === "true";
-  } else if ((raw === "on" || raw === "off") && ON_OFF_DOMAINS.has(domain)) {
+  } else if ((raw === "on" || raw === "off") && HASS_ON_OFF_DOMAIN_SET.has(domain)) {
     isBinary = true;
     valueKind = "binary";
     booleanValue = raw === "on";
