@@ -66,11 +66,11 @@ async function main() {
     );
   });
 
-  const registry = await client.devices.getDeviceRegistry();
-  console.log("[rest] device registry entries:", registry.length);
+  console.log("\n--- Device tree (devices → entities, like HA device page) ---\n");
+  console.log(await client.devices.getDeviceTreeAsText());
 
   const ping = await client.server.ping();
-  console.log("[rest] ping:", ping.message);
+  console.log("\n[rest] ping:", ping.message);
 }
 
 void main();

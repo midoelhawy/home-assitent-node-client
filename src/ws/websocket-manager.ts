@@ -1,6 +1,6 @@
 import WebSocket from "ws";
 import { WebSocketNotConnectedError } from "../errors.js";
-import type { HassDeviceRegistryEntry } from "../types/hass.js";
+import type { HassDeviceRegistryEntry, HassEntityRegistryEntry } from "../types/hass.js";
 import type {
   WebSocketEventName,
   WebSocketEvents,
@@ -120,6 +120,12 @@ export class WebSocketManager {
   async listDeviceRegistry(): Promise<HassDeviceRegistryEntry[]> {
     const result = await this.sendCommand<unknown>("config/device_registry/list");
     return result as HassDeviceRegistryEntry[];
+  }
+
+  /** Entity registry (only available via WebSocket; there is no REST equivalent on stock HA). */
+  async listEntityRegistry(): Promise<HassEntityRegistryEntry[]> {
+    const result = await this.sendCommand<unknown>("config/entity_registry/list");
+    return result as HassEntityRegistryEntry[];
   }
 
   private emit<K extends WebSocketEventName>(event: K, payload: WebSocketEvents[K]): void {

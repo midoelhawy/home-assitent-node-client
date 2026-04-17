@@ -10,6 +10,7 @@ export type {
   HassApiStatus,
   HassConfig,
   HassContext,
+  HassEntityRegistryEntry,
   HassDeviceRegistryEntry,
   HassHistoryRow,
   HassHistoryState,
@@ -18,6 +19,14 @@ export type {
   HassState,
 } from "./types/hass.js";
 export { DevicesManager } from "./devices/devices-manager.js";
+export {
+  buildHaDeviceTree,
+  deviceTitle,
+  formatDeviceTreeAsText,
+  statesArrayToMap,
+  type HaDeviceTree,
+  type HaDeviceTreeNode,
+} from "./devices/device-tree.js";
 export { HistoryManager, type HistoryQuery } from "./history/history-manager.js";
 export { ZWaveManager } from "./zwave/zwave-manager.js";
 export { ServerApiManager } from "./server/server-api-manager.js";

@@ -110,6 +110,54 @@ Emitted events:
 
 Some methods require WebSocket in this SDK (for example `client.devices.getDeviceRegistry()`).
 
+### Registries (WebSocket only)
+
+Home Assistant does **not** expose `GET /api/config/entity_registry/list` in core. Use the WebSocket API instead:
+
+| Method | WebSocket command |
+|--------|-------------------|
+| `client.ws!.listDeviceRegistry()` | `config/device_registry/list` |
+| `client.ws!.listEntityRegistry()` | `config/entity_registry/list` |
+
+Each entity registry row includes a `device_id` when the entity belongs to a physical device; that ID matches `device.id` in the device registry (same grouping as the HA UI device pages).
+
+## Device tree (group entities by device)
+
+Build the same **device → entities** structure as in Settings → Devices: one entry per device, with all related entities nested underneath.
+
+```ts
+await client.connectWebSocket();
+
+// Structured data
+const tree = await client.devices.getDeviceTree();
+for (const { device, entities } of tree.devices) {
+  console.log(device.name ?? device.id, entities.map((e) => e.entity_id));
+}
+// Entities without a device (helpers, some core entities, …)
+console.log(tree.unassignedEntities.length);
+
+// FOR CLI (OR DEBUG CASES )
+console.log(await client.devices.getDeviceTreeAsText());
+// Without live state values:
+console.log(await client.devices.getDeviceTreeAsText(false));
+```
+
+Lower-level helpers (same package) if you already fetched registry arrays:
+
+```ts
+import {
+  buildHaDeviceTree,
+  formatDeviceTreeAsText,
+  statesArrayToMap,
+} from "home-assistant-node-client";
+
+const tree = buildHaDeviceTree(devices, entities);
+const states = await client.devices.getAllDevices();
+const text = formatDeviceTreeAsText(tree, {
+  statesByEntityId: statesArrayToMap(states),
+});
+```
+
 ## State normalization
 
 Helpers turn raw `HassState` / `state_changed` payloads into a consistent shape (`valueKind`, `coreDomain`, booleans for on/off entities, etc.).

@@ -14,6 +14,21 @@ export interface HassContext {
   user_id: string | null;
 }
 
+/**
+ * Row from the entity registry (WebSocket `config/entity_registry/list`; no standard REST list in core HA).
+ * `device_id` links this entity to a {@link HassDeviceRegistryEntry} (`id` field).
+ */
+export interface HassEntityRegistryEntry {
+  entity_id: string;
+  /** Parent device in the device registry; `null` if the entity is not tied to a device. */
+  device_id: string | null;
+  area_id: string | null;
+  platform: string;
+  /** Friendly name in the UI when set. */
+  name?: string | null;
+  [key: string]: unknown;
+}
+
 export interface HassDeviceRegistryEntry {
   area_id: string | null;
   configuration_url: string | null;
