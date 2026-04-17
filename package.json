@@ -1,8 +1,9 @@
 {
   "name": "home-assistant-node-client",
   "version": "0.1.0",
-  "description": "TypeScript SDK for Home Assistant (REST + optional WebSocket)",
+  "description": "TypeScript/JavaScript SDK for Home Assistant: REST API, optional WebSocket subscriptions, state helpers, and simplified entity actions.",
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -61,7 +62,10 @@
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "test:rest_api_only": "env-cmd -f .env ts-node examples/rest-only.ts",
-    "test:with_websocket": "env-cmd -f .env ts-node examples/with-websocket.ts"
+    "test:with_websocket": "env-cmd -f .env ts-node examples/with-websocket.ts",
+    "release:patch": "npm run build && npm version patch && npm publish",
+    "release:minor": "npm run build && npm version minor && npm publish",
+    "release:major": "npm run build && npm version major && npm publish"
   },
   "keywords": [
     "home-assistant",
